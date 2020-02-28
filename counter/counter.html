@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador</title>
+</head>
+
+<body>
+    <h1>Contador</h1>
+    <ul>
+        <li>Al ir escribiendo los segundos, se debe actualizar el botón con "Contar x segundos"</li>
+        <li>Si el input está vacío el botón debe decir solo "Contar"</li>
+        <li>Al presionar la tecla "Enter" se debe accionar el botón "Contar"</li>
+        <li>Al momento de contar debe quedar enfocado el input con todo el valor seleccionado para que no se tenga que
+            borrar</li>
+        <li>Cuando se haga clic en el botón se debe agregar un nuevo elemento a la lista con los "segundos/cantidad"
+        </li>
+        <li>Cada cambio de segundo sebe reflejarse en el elemento de la lista y en la consola de javascript</li>
+        <li>Al hacer clic en el contador, se debe eliminar</li>
+    </ul>
+    <label>
+        Segundos:
+        <input id="inputCounter" type="number">
+    </label>
+    <button id="buttonCounter">Contar</button>
+    <ul id="list"></ul>
+    <script>
+
+        const input = document.querySelector('input');
+        const button = document.querySelector('button');
+        const list = document.getElementById('list');
+
+
+        input.addEventListener('keyup', updateValue);
+        input.addEventListener('keyup', enterButton)
+        button.addEventListener('click', () => {
+            pressButton();
+        })
+
+        function enterButton(e) {
+            if (e.keyCode === 13) {
+                button.onclick = pressButton()
+            }
+        }
+        function updateValue(e) {
+            if (e.target.value !== "") {
+                button.textContent = "Contar " + e.target.value + " segundos";
+            }
+            else {
+                button.textContent = "Contar";
+            }
+        }
+        function pressButton() {
+            let element = document.createElement('li');
+      
+            input.focus();
+            input.select();
+            let counter = 0;
+            let value = input.value;
+            element.textContent = counter + "/" + value;
+
+            const createClock = setInterval(function(){
+                counter++;
+                element.textContent = counter + "/" + value;
+            }, 1000);
+
+            list.appendChild(element);
+
+            if(counter===Number(value)){
+                clearInterval(createClock);
+            }
+            
+        }
+
+       
+
+    </script>
+</body>
+
+</html>
