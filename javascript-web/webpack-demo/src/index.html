@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Task Manager</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:700|Roboto:300,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+<header>
+  <h1>Administrador de tareas</h1>
+</header>
+<main>
+  <label>
+    <input id="addTaskInput" type="text" placeholder="¿Qué necesitas hacer?">
+  </label>
+  <ul id="taskList">
+    <!--  it fills with javascript listTasksElements function  -->
+  </ul>
+  <div class="info">
+    <p id="tasksLeft">Quedan 0 tareas</p>
+    <div>
+      <button id="allButton" class="button" disabled>Todas</button>
+      <button id="pendingButton" class="button">Pendientes</button>
+      <button id="completedButton" class="button">Completadas</button>
+    </div>
+  </div>
+</main>
+<footer>
+  <p>Autor: Daniel Candil Vizcaino</p>
+  <p>GitHub: <a href="https://github.com/DanielCandilBabel/">https://github.com/DanielCandilBabel/</a></p>
+</footer>
+<div class="modal-container">
+  <div class="modal">
+    <h2>¿Estás seguro de que deseas eliminar esta tarea?</h2>
+    <p>Una tarea para eliminar</p>
+    <div>
+      <button class="button large" id = "btnYes">Si</button>
+      <button class="button large" id = "btnNo">No</button>
+    </div>
+  </div>
+</div>
+<script src="bundle.js"></script>
+</body>
+</html>
