@@ -16,30 +16,20 @@ class Tasks {
   removeTask(task: Task) {
     let encontrado = false;
     let contador = 0;
-    let index = -1;
     while (!encontrado && contador < this.counterId) {
       if (this.list[contador].id === task.id) {
-        index = contador;
+        this.counterId--;
+        this.list.splice(contador, 1);
         encontrado = true;
       }
       contador++;
     }
-    if (index !== -1) {
-      alert(index);
-      this.counterId--;
-      this.list.splice(index, 1);
-      return true;
-    }
-    return false;
   }
-
 
   copyTasks(tasks: Tasks) {
     this.list = tasks.list;
     this.counterId = tasks.counterId;
   }
-
-
 };
 
 class Task {
@@ -62,104 +52,26 @@ const completedButton: HTMLButtonElement = document.querySelector('#completedBut
 const taskList = document.querySelector('#taskList');
 const tasksLeft: HTMLParagraphElement = document.querySelector("#tasksLeft");
 const counters: HTMLUListElement = document.querySelector('#counters');
+document.getElementById("taskList").style.display = "flex";
+document.getElementById("taskList").style.flexDirection = "column";
+
 let countTaskLeft: number = 0;
 let pending: Array<Element>;
-let tareas:Tasks = new Tasks();
+let tareas: Tasks = new Tasks();
+
 //Events
+setItemJson(tareas);
 
 input.onkeyup = (e) => {
 
   if (e.key === 'Enter') {
-    countTaskLeft++;
-
-    const li: HTMLLIElement = document.createElement('li');
-    let div1 = document.createElement("div");
-    let div2 = document.createElement("div");
-
-    document.getElementById("taskList").style.display = "flex";
-    document.getElementById("taskList").style.flexDirection = "column";
-
-    let checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-
-    let span = document.createElement("span");
-    span.textContent = input.value;
-
-
-
-    let tarea:Task = new Task(span.textContent, "completed", tareas.counterId);
+    let tarea: Task = new Task(input.value, "pending", tareas.counterId);
     tareas.addTask(tarea);
-
     setItemJson(tareas);
-
-    let icon = document.createElement("i");
-    icon.onclick = () => {
-      let modalCO: HTMLCollectionOf<Element> = document.getElementsByClassName("modal-container");
-      modalCO[0].className = "modal-container open";
-
-      let btnNo: HTMLElement = document.getElementById("btnNo");
-      btnNo.onclick = () => { modalCO[0].className = "modal-container" };
-
-      let btnYes: HTMLElement = document.getElementById("btnYes");
-      btnYes.onclick = (e) => {
-        tareas.removeTask(tarea);
-        li.remove();
-        modalCO[0].className = "modal-container";
-        countTaskLeft--;
-        tasksLeft.textContent = String("Quedan " + countTaskLeft + " tareas");
-      }
-    };
-
-    span.onclick = () => {
-      li.style.display = "none";
-      const liChange: HTMLLIElement = document.createElement('li');
-      const inputLi: HTMLInputElement = document.createElement('input');
-      liChange.className = "updating";
-      inputLi.type = "text";
-      const iconCheck = document.createElement("i");
-      iconCheck.className = "material-icons btn-check";
-      iconCheck.textContent = "done";
-      inputLi.value = span.textContent;
-      liChange.appendChild(inputLi);
-      liChange.appendChild(iconCheck);
-      li.parentElement.insertBefore(liChange, li);
-      iconCheck.onclick = function () {
-        span.textContent = inputLi.value;
-        li.style.display = "";
-        liChange.remove();
-      }
-
-    }
-
-    checkbox.onclick = (e) => {
-      if (checkbox.checked) {
-        countTaskLeft--;
-        tarea.state="pending"
-      }
-      else {
-        tarea.state="completed"
-        countTaskLeft++;
-      }
-      tasksLeft.textContent = String("Quedan " + countTaskLeft + " tareas");
-    }
-    icon.className = 'material-icons btn-delete';
-    icon.textContent = 'delete_outline';
-
-    div1.appendChild(checkbox);
-    div1.appendChild(span);
-    div2.appendChild(icon);
-
-    li.appendChild(div1);
-    li.appendChild(div2);
-    li.style.display = "flex";
-    li.style.justifyContent = "space-between"
-    li.style.flexDirection = "row;"
-    document.getElementById("taskList").appendChild(li);
-    input.focus();
-    input.value = "";
-    tasksLeft.textContent = String("Quedan " + countTaskLeft + " tareas");
+    //createLi(tareas);
   }
 }
+
 
 /*BUTTON*/
 
@@ -169,6 +81,7 @@ allButton.onclick = (e) => {
     pendingButton.disabled = false;
     allButton.disabled = true;
     completedButton.disabled = false;
+    view(tareas)
   }
 }
 
@@ -179,6 +92,7 @@ pendingButton.onclick = (e) => {
     pendingButton.disabled = true;
     allButton.disabled = false;
     completedButton.disabled = false;
+    view(tareas)
   }
 }
 
@@ -188,32 +102,9 @@ completedButton.onclick = (e) => {
     pendingButton.disabled = false;
     allButton.disabled = false;
     completedButton.disabled = true;
+    view(tareas)
   }
 }
-
-// let myTasks = new Tasks();
-// let taskprueba = new Task("uno", "completed", 0);
-
-// let taskpruebados = new Task("dos", "pending", 1);
-
-// myTasks.addTask(taskprueba);
-// myTasks.addTask(taskpruebados);
-
-//setItemJson(tareas);
-// let copia: Tasks = new Tasks();
-// let parseo: Tasks = parseoJSONTasks();
-// copia.copyTasks(parseo);
-
-// console.log("---------------------------------------------------------------");
-
-// console.log(taskpruebados);
-
-// copia.removeTask(taskpruebados);
-
-
-// setItemJson(copia);
-// console.log(parseoJSONTasks());
-
 
 
 //Functions
@@ -224,7 +115,165 @@ function parseoJSONTasks() {
 }
 
 function setItemJson(myTasks: Tasks) {
-  localStorage.setItem("tasks", JSON.stringify(myTasks))
+  localStorage.setItem("tasks", JSON.stringify(myTasks));
+  view(myTasks);
 }
 
+//Depend of the button option, you can see all tasks, pending task or completed tasks
+
+function view(tareas:Tasks){
+  if(allButton.disabled){
+    allTask(tareas);
+  }
+  if(pendingButton.disabled){
+    pendingTask(tareas);
+  }
+  if(completedButton.disabled){
+    completedTask(tareas);
+  }
+}
+
+// Show all task. That create <li> with all task
+
+function allTask(myTasks:Tasks){
+  removeElement()
+  myTasks.list.forEach(element => {
+    createTasks(element);
+  });
+  tasksLeft.textContent = String("Quedan " + countTask(myTasks) + " tareas");
+}
+
+// Show only pending tasks. That create <li> with pending task
+
+function pendingTask(myTasks:Tasks){
+  removeElement()
+  myTasks.list.forEach(element => {
+    if(element.state==="pending"){
+      createTasks(element);
+    }
+  });
+  tasksLeft.textContent = String("Quedan " + countTask(myTasks) + " tareas");
+}
+
+// Show only completed tasks. That create <li> with completed task
+
+function completedTask(myTasks:Tasks){
+  removeElement()
+  myTasks.list.forEach(element => {
+    if(element.state==="completed"){
+      createTasks(element);
+    }
+  });
+  tasksLeft.textContent = String("Quedan " + countTask(myTasks) + " tareas");
+}
+
+//this function create the <li> with the text content in the element Task and the drop icon and the event listener
+
+function createTasks(element:Task){
+
+  const li: HTMLLIElement = document.createElement('li');
+  li.id = "listInput";
+  let div1 = document.createElement("div");
+  let div2 = document.createElement("div");
+
+  let checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+
+  let span = document.createElement("span");
+  span.textContent = element.name;
+
+  let icon = document.createElement("i");
+  icon.onclick = () => {
+    let modalCO: HTMLCollectionOf<Element> = document.getElementsByClassName("modal-container");
+    modalCO[0].className = "modal-container open";
+
+    let btnNo: HTMLElement = document.getElementById("btnNo");
+    btnNo.onclick = () => { modalCO[0].className = "modal-container" };
+
+    let btnYes: HTMLElement = document.getElementById("btnYes");
+    btnYes.onclick = (e) => {
+      tareas.removeTask(element);
+      li.remove();
+      setItemJson(tareas);
+      modalCO[0].className = "modal-container";
+    }
+  };
+//when the user click in the task
+  span.onclick = () => {
+    li.style.display = "none";
+    const liChange: HTMLLIElement = document.createElement('li');
+    const inputLi: HTMLInputElement = document.createElement('input');
+
+
+    inputLi.type = "text";
+    inputLi.value = span.textContent;
+
+    const iconCheck = document.createElement("i");
+    iconCheck.className = "material-icons btn-check";
+    iconCheck.textContent = "done";
+
+    liChange.className = "updating";
+    liChange.appendChild(inputLi);
+    liChange.appendChild(iconCheck);
+
+    li.parentElement.insertBefore(liChange, li);
+
+    iconCheck.onclick = function () {
+      span.textContent = inputLi.value;
+      li.style.display = "";
+      liChange.remove();
+      setItemJson(tareas);
+    }
+
+  }
+
+  //When the user click in the checkbox change task's state
+  checkbox.onclick = (e) => {
+    if (checkbox.checked) {
+      element.state = "pending"
+    }
+    else {
+      element.state = "completed"
+    }
+    setItemJson(tareas);
+  }
+
+  icon.className = 'material-icons btn-delete';
+  icon.textContent = 'delete_outline';
+
+  div1.appendChild(checkbox);
+  div1.appendChild(span);
+  div2.appendChild(icon);
+
+  li.appendChild(div1);
+  li.appendChild(div2);
+  li.style.display = "flex";
+  li.style.justifyContent = "space-between"
+  li.style.flexDirection = "row;"
+  document.getElementById("taskList").appendChild(li);
+  input.focus();
+  input.value = "";
+  tasksLeft.textContent = String("Quedan " + countTask(tareas) + " tareas");
+}
+
+
+//Remove all task
+function removeElement() {
+  if (taskList.hasChildNodes()) {
+    while (taskList.childNodes.length >= 1) {
+      taskList.removeChild(taskList.firstChild);
+    }
+  }
+}
+
+//Tasks' counter
+function countTask(myTasks:Tasks){
+  let count: number = 0;
+  myTasks.list.forEach(element => {
+    if(element.state==="completed"){
+      count++;
+    }
+  });
+  return myTasks.counterId - count;
+}
 
