@@ -59,8 +59,15 @@ let countTaskLeft: number = 0;
 let pending: Array<Element>;
 let tareas: Tasks = new Tasks();
 
+let parseo = parseoJSONTasks();
+if(parseo !== null){
+  tareas.copyTasks(parseo);
+}
+
+
+view(tareas);
 //Events
-setItemJson(tareas);
+
 
 input.onkeyup = (e) => {
 
@@ -68,6 +75,7 @@ input.onkeyup = (e) => {
     let tarea: Task = new Task(input.value, "pending", tareas.counterId);
     tareas.addTask(tarea);
     setItemJson(tareas);
+    view(tareas);
     //createLi(tareas);
   }
 }
@@ -116,7 +124,7 @@ function parseoJSONTasks() {
 
 function setItemJson(myTasks: Tasks) {
   localStorage.setItem("tasks", JSON.stringify(myTasks));
-  view(myTasks);
+
 }
 
 //Depend of the button option, you can see all tasks, pending task or completed tasks
@@ -178,6 +186,12 @@ function createTasks(element:Task){
 
   let checkbox = document.createElement("input");
   checkbox.type = "checkbox";
+  if(element.state==="completed"){
+    checkbox.checked=true;
+  }
+  else{
+    checkbox.checked=false;
+  }
 
   let span = document.createElement("span");
   span.textContent = element.name;
@@ -195,6 +209,7 @@ function createTasks(element:Task){
       tareas.removeTask(element);
       li.remove();
       setItemJson(tareas);
+      view(tareas);
       modalCO[0].className = "modal-container";
     }
   };
@@ -223,6 +238,7 @@ function createTasks(element:Task){
       li.style.display = "";
       liChange.remove();
       setItemJson(tareas);
+      view(tareas);
     }
 
   }
@@ -230,12 +246,13 @@ function createTasks(element:Task){
   //When the user click in the checkbox change task's state
   checkbox.onclick = (e) => {
     if (checkbox.checked) {
-      element.state = "pending"
-    }
-    else {
       element.state = "completed"
     }
+    else {
+      element.state = "pending"
+    }
     setItemJson(tareas);
+    tasksLeft.textContent = String("Quedan " + countTask(tareas) + " tareas");
   }
 
   icon.className = 'material-icons btn-delete';
@@ -253,6 +270,7 @@ function createTasks(element:Task){
   document.getElementById("taskList").appendChild(li);
   input.focus();
   input.value = "";
+  setItemJson(tareas);
   tasksLeft.textContent = String("Quedan " + countTask(tareas) + " tareas");
 }
 
