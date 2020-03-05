@@ -18,7 +18,6 @@ class Tasks {
     let contador = 0;
     while (!encontrado && contador < this.counterId) {
       if (this.list[contador].id === task.id) {
-        this.counterId--;
         this.list.splice(contador, 1);
         encontrado = true;
       }
@@ -235,6 +234,7 @@ function createTasks(element:Task){
 
     iconCheck.onclick = function () {
       span.textContent = inputLi.value;
+      element.name = span.textContent;
       li.style.display = "";
       liChange.remove();
       setItemJson(tareas);
